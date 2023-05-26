@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">genol_salatiel_ex3tDist</string>
+    <string name="launcher_top_bar">Genol_Salatiel_ex3tDist</string>
+    <string name="launcher_button_one">Registro clientes</string>
+    <string name="launcher_button_two">Gestión clientes</string>
+</resources>
