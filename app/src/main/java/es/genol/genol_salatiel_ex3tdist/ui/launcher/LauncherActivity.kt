@@ -19,11 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import es.genol.genol_salatiel_ex3tdist.R
+import es.genol.genol_salatiel_ex3tdist.ui.clients.ui.ClientViewModel
 import es.genol.genol_salatiel_ex3tdist.ui.clients.ui.ManageScreen
 import es.genol.genol_salatiel_ex3tdist.ui.clients.ui.RegisterScreen
 import es.genol.genol_salatiel_ex3tdist.ui.theme.Genol_salatiel_ex3tDistTheme
@@ -38,12 +40,13 @@ class LauncherActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val clientViewModel: ClientViewModel = viewModel()
             Genol_salatiel_ex3tDistTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LauncherNavController()
+                    LauncherNavController(clientViewModel)
                 }
             }
         }
@@ -52,11 +55,11 @@ class LauncherActivity : ComponentActivity() {
 
 
 @Composable
-fun LauncherNavController() {
+fun LauncherNavController(clientViewModel: ClientViewModel) {
     val navController = rememberNavController()
     NavHost(navController, startDestination = LauncherModel.ExerciseList.path) {
         composable(route = LauncherModel.ExerciseList.path) { ExerciseList(navController) }
-        composable(route = LauncherModel.ExerciseOne.path) { RegisterScreen() }
+        composable(route = LauncherModel.ExerciseOne.path) { RegisterScreen(clientViewModel) }
         composable(route = LauncherModel.ExerciseTwo.path) { ManageScreen() }
     }
 }

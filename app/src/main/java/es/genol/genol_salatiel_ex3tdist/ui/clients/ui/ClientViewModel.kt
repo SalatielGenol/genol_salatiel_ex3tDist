@@ -3,6 +3,7 @@ package es.genol.genol_salatiel_ex3tdist.ui.clients.ui
 
 import androidx.lifecycle.ViewModel
 import es.genol.genol_salatiel_ex3tdist.ui.clients.data.ClientData
+import es.genol.genol_salatiel_ex3tdist.ui.clients.data.ClientModel
 import es.genol.genol_salatiel_ex3tdist.ui.clients.data.MIN_PASS_CHARACTERS
 import es.genol.genol_salatiel_ex3tdist.ui.clients.data.MIN_USER_CHARACTERS
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,14 +15,8 @@ class ClientViewModel : ViewModel() {
     private var _uiState = MutableStateFlow(ClientUiState())
     val uiState: StateFlow<ClientUiState> = _uiState.asStateFlow()
 
-    private var _clientsList = mutableListOf<ClientData>()
-    val clientList get() = _clientsList.toList()
-
-    /*
-    No he conseguido meter estos 3 datos en la clase ClientUiState,
-    internamente si que se modificaba el dato al hacerlo con un constructor
-    pero luego no me modificaba la vista, no entiendo por que puede ser.
-     */
+    private val _clientsData = ClientData()
+    val clientsData get() = _clientsData.clientsList
 
     private var _isUserTypedValid = false
     val isUserTypedValid get() = _isUserTypedValid
@@ -35,15 +30,13 @@ class ClientViewModel : ViewModel() {
     private var _isPassTypedValid = false
     val isPassTypedValid get() = _isPassTypedValid
 
-    /*
-    No he conseguido hacer funcionar de ninguna manera que se habilite el boton a partir
-    de las validaciones, el && me da por valida la primera condicion y anula el resto.
-    */
-    private var _isSignInEnabled = true
-    val isSignInEnabled get() = _isSignInEnabled
+    val isSignInEnabled get() = (uiState.value.userName.isNotBlank()
+            && uiState.value.mailAddress.isNotBlank()
+            && uiState.value.password.isNotBlank()
+            && uiState.value.passwordConfirm.isNotBlank())
+            && (!_isUserTypedValid && !_isEmailTypedValid
+            && !_isPassTypedLengthValid && !_isPassTypedValid)
 
-    private var _isUserRegistered = false
-    val isUserRegistered get() = _isUserRegistered
 
     fun validateUserName(userName: String) {
         _isUserTypedValid = userName.isNotBlank() && userName.length <= MIN_USER_CHARACTERS
@@ -60,11 +53,13 @@ class ClientViewModel : ViewModel() {
         }
     }
 
+
     fun validatePassLength(pass: String) {
         _isPassTypedLengthValid = pass.isNotBlank() && pass.length <= MIN_PASS_CHARACTERS
         _uiState.update {
             it.copy(password = pass)
         }
+        validateOppositePassword()
     }
 
     fun validatePassword(pass: String) {
@@ -74,26 +69,54 @@ class ClientViewModel : ViewModel() {
         }
     }
 
-    fun countUp() {
-        _uiState.update {
-            it.copy(currentClientCount = _uiState.value.currentClientCount )
+
+    /*
+    Esta funcion sirve para comprobar el estado del textfield donde se reescribe la contraseña
+    desde el textfield donde se introduce por primera vez la contraseña, asi si se hacen coincidir
+    desde cualquiera de los dos textfield, se elimina el error de ambos.
+     */
+    private fun validateOppositePassword(){
+        _isPassTypedValid = uiState.value.passwordConfirm.isNotBlank()
+                && uiState.value.passwordConfirm != uiState.value.password
+    }
+
+    private fun isUserRegistered():Boolean {
+        return clientsData.any{
+            it.user == uiState.value.userName
+                    && it.email == uiState.value.mailAddress
         }
+
     }
 
-    fun signIn() {
-        _clientsList.add(
-            element = ClientData(
-                user = _uiState.value.userName,
-                email = _uiState.value.mailAddress,
-                password = _uiState.value.passwordConfirm
+    fun addUser() {
+        if (!isUserRegistered()){
+            _clientsData.addClient(
+                item = ClientModel(
+                    user = _uiState.value.userName,
+                    email = _uiState.value.mailAddress,
+                    password = _uiState.value.passwordConfirm
+                )
             )
-        )
-        _uiState.value = ClientUiState()
-        _isSignInEnabled = false
-        _isUserRegistered = true
+            _uiState.update {
+                it.copy(isUserRegistered = true)
+            }
+        }else {
+            _uiState.update {
+                it.copy(isUserRegistered = false)
+            }
+        }
+
+
     }
 
-    fun confirm(){
-        _isUserRegistered = false
+    fun dialogOkConfirm() {
+        _uiState.value = ClientUiState()
+        dialogClose()
+    }
+
+    fun dialogClose() {
+        _uiState.update {
+            it.copy(isUserRegistered = null)
+        }
     }
 }

@@ -6,4 +6,5 @@ data class ClientUiState(
     val mailAddress: String = "",
     val password: String = "",
     val passwordConfirm: String = "",
+    val isUserRegistered: Boolean? = null
 )

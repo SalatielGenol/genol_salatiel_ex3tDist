@@ -1,6 +1,9 @@
 package es.genol.genol_salatiel_ex3tdist.ui.clients.data
 
-const val MIN_USER_CHARACTERS = 3
-const val MIN_PASS_CHARACTERS = 4
+class ClientData (private val _clientsList: MutableList<ClientModel> = mutableListOf()) {
+    val clientsList get() = _clientsList.toList()
 
-data class ClientData(val user: String, val email: String, val password:String, )
+    fun addClient(item: ClientModel){
+        _clientsList.add(element = item)
+    }
+}

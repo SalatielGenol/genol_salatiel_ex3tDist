@@ -23,24 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen() {
-    val clientViewModel: ClientViewModel = viewModel()
+fun RegisterScreen(clientViewModel: ClientViewModel) {
     val clientUiState by clientViewModel.uiState.collectAsState()
-
-        if (clientViewModel.isUserRegistered){
-            RegisteredDialog(onConfirm = {clientViewModel.confirm()})
-        }
 
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = "Registro") },
             actions = {
                 Row(Modifier.padding(end = 5.dp)) {
                     Text(text = "Clientes: ")
-                    Text(text = clientViewModel.clientList.size.toString())
+                    Text(text = clientViewModel.clientsData.size.toString())
                 }
             }
         )
@@ -52,7 +46,7 @@ fun RegisterScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Card() {
+            Card {
                 Column(
                     Modifier
                         .fillMaxHeight(.7f)
@@ -105,7 +99,7 @@ fun RegisterScreen() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                     )
                     Button(
-                        onClick = { clientViewModel.signIn() },
+                        onClick = { clientViewModel.addUser() },
                         enabled = clientViewModel.isSignInEnabled
                     ) {
                         Text(text = "Sign in")
@@ -114,17 +108,38 @@ fun RegisterScreen() {
             }
         }
     }
+
+    clientUiState.isUserRegistered?.let { registerConfirm ->
+        if (registerConfirm) RegisteredDialog(onConfirm = { clientViewModel.dialogOkConfirm() }) else MatchDialog(
+            onConfirm = { clientViewModel.dialogClose() })
+
+    }
 }
 
 @Composable
 fun RegisteredDialog(onConfirm: () -> Unit) {
     AlertDialog(
-        onDismissRequest = { /*TODO*/ },
+        onDismissRequest = { onConfirm() },
         confirmButton = {
             Button(onClick = onConfirm) {
                 Text(text = "Aceptar")
             }
+        },
+        title = { Text(text = "Usuario añadido") },
+        text = { Text(text = "Usuario registrado correctamente") }
+    )
+}
 
-        }
+@Composable
+fun MatchDialog(onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onConfirm() },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(text = "Aceptar")
+            }
+        },
+        title = { Text(text = "Usuario existente") },
+        text = { Text(text = "El nombre de usuario y/o email ya estan en uso") }
     )
 }
