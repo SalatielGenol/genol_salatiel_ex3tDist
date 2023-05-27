@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class ClientViewModel : ViewModel() {
-    private var _uiState = MutableStateFlow(ClientUiState())
-    val uiState: StateFlow<ClientUiState> = _uiState.asStateFlow()
+    private var _uiRegisterState = MutableStateFlow(ClientRegisterUiState())
+    val uiRegisterState: StateFlow<ClientRegisterUiState> = _uiRegisterState.asStateFlow()
 
     private val _clientsData = ClientData()
     val clientsData get() = _clientsData.clientsList
@@ -30,17 +30,17 @@ class ClientViewModel : ViewModel() {
     private var _isPassTypedValid = false
     val isPassTypedValid get() = _isPassTypedValid
 
-    val isSignInEnabled get() = (uiState.value.userName.isNotBlank()
-            && uiState.value.mailAddress.isNotBlank()
-            && uiState.value.password.isNotBlank()
-            && uiState.value.passwordConfirm.isNotBlank())
+    val isSignInEnabled get() = (uiRegisterState.value.userName.isNotBlank()
+            && uiRegisterState.value.mailAddress.isNotBlank()
+            && uiRegisterState.value.password.isNotBlank()
+            && uiRegisterState.value.passwordConfirm.isNotBlank())
             && (!_isUserTypedValid && !_isEmailTypedValid
             && !_isPassTypedLengthValid && !_isPassTypedValid)
 
 
     fun validateUserName(userName: String) {
         _isUserTypedValid = userName.isNotBlank() && userName.length <= MIN_USER_CHARACTERS
-        _uiState.update {
+        _uiRegisterState.update {
             it.copy(userName = userName)
         }
     }
@@ -48,23 +48,22 @@ class ClientViewModel : ViewModel() {
     fun validateEmail(email: String) {
         _isEmailTypedValid =
             email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        _uiState.update {
+        _uiRegisterState.update {
             it.copy(mailAddress = email)
         }
     }
 
-
     fun validatePassLength(pass: String) {
         _isPassTypedLengthValid = pass.isNotBlank() && pass.length <= MIN_PASS_CHARACTERS
-        _uiState.update {
+        _uiRegisterState.update {
             it.copy(password = pass)
         }
         validateOppositePassword()
     }
 
     fun validatePassword(pass: String) {
-        _isPassTypedValid = pass.isNotBlank() && pass != uiState.value.password
-        _uiState.update {
+        _isPassTypedValid = pass.isNotBlank() && pass != uiRegisterState.value.password
+        _uiRegisterState.update {
             it.copy(passwordConfirm = pass)
         }
     }
@@ -76,32 +75,32 @@ class ClientViewModel : ViewModel() {
     desde cualquiera de los dos textfield, se elimina el error de ambos.
      */
     private fun validateOppositePassword(){
-        _isPassTypedValid = uiState.value.passwordConfirm.isNotBlank()
-                && uiState.value.passwordConfirm != uiState.value.password
+        _isPassTypedValid = uiRegisterState.value.passwordConfirm.isNotBlank()
+                && uiRegisterState.value.passwordConfirm != uiRegisterState.value.password
     }
 
     private fun isUserRegistered():Boolean {
         return clientsData.any{
-            it.user == uiState.value.userName
-                    && it.email == uiState.value.mailAddress
+            it.user == uiRegisterState.value.userName
+                    && it.email == uiRegisterState.value.mailAddress
         }
 
     }
 
-    fun addUser() {
+    fun addClient() {
         if (!isUserRegistered()){
             _clientsData.addClient(
                 item = ClientModel(
-                    user = _uiState.value.userName,
-                    email = _uiState.value.mailAddress,
-                    password = _uiState.value.passwordConfirm
+                    user = _uiRegisterState.value.userName,
+                    email = _uiRegisterState.value.mailAddress,
+                    password = _uiRegisterState.value.passwordConfirm
                 )
             )
-            _uiState.update {
+            _uiRegisterState.update {
                 it.copy(isUserRegistered = true)
             }
         }else {
-            _uiState.update {
+            _uiRegisterState.update {
                 it.copy(isUserRegistered = false)
             }
         }
@@ -110,13 +109,29 @@ class ClientViewModel : ViewModel() {
     }
 
     fun dialogOkConfirm() {
-        _uiState.value = ClientUiState()
+        _uiRegisterState.value = ClientRegisterUiState()
         dialogClose()
     }
 
     fun dialogClose() {
-        _uiState.update {
+        _uiRegisterState.update {
             it.copy(isUserRegistered = null)
         }
+    }
+
+    /*
+    Funciones para la lista de gestion de clientes
+     */
+
+    fun delClient(element: ClientModel){
+        _clientsData.delClient(item = element)
+    }
+
+    fun checkItem(client: ClientModel) {
+        _clientsData.modifyCheckBox(client)
+    }
+
+    fun delClientsRowChecked(){
+        _clientsData.delChecked()
     }
 }

@@ -41,6 +41,8 @@ class LauncherActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val clientViewModel: ClientViewModel = viewModel()
+
+
             Genol_salatiel_ex3tDistTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -60,7 +62,7 @@ fun LauncherNavController(clientViewModel: ClientViewModel) {
     NavHost(navController, startDestination = LauncherModel.ExerciseList.path) {
         composable(route = LauncherModel.ExerciseList.path) { ExerciseList(navController) }
         composable(route = LauncherModel.ExerciseOne.path) { RegisterScreen(clientViewModel) }
-        composable(route = LauncherModel.ExerciseTwo.path) { ManageScreen() }
+        composable(route = LauncherModel.ExerciseTwo.path) { ManageScreen(clientViewModel) }
     }
 }
 

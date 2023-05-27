@@ -3,4 +3,20 @@
     <string name="launcher_top_bar">Genol_Salatiel_ex3tDist</string>
     <string name="launcher_button_one">Registro clientes</string>
     <string name="launcher_button_two">Gestión clientes</string>
+    <string name="delete_client">Delete client</string>
+    <string name="reveal_the_password">Reveal the password</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="usuario_a_adido">Usuario añadido</string>
+    <string name="usuario_registrado">Usuario registrado correctamente</string>
+    <string name="usuario_existente">Usuario existente</string>
+    <string name="usuario_no_valido">El nombre de usuario y/o email ya estan en uso</string>
+    <string name="listado_de_clientes">Listado de clientes</string>
+    <string name="elimina_varios_registros">Elimina varios registros</string>
+    <string name="registro">Registro</string>
+    <string name="clientes">"Clientes: "</string>
+    <string name="nombre_de_usuario">Nombre de usuario</string>
+    <string name="email">Email</string>
+    <string name="contrase_a">Contraseña</string>
+    <string name="repetir_contrase_a">Repetir contraseña</string>
+    <string name="sign_in">Sign in</string>
 </resources>
